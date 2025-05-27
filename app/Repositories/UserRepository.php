@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories;
 
 use App\Models\User;
@@ -33,7 +34,7 @@ class UserRepository //Repository is only for DB queries
         return DB::table('users')
             ->find($id);
     }
-    
+
     public function createUser(string $name, string $username, string $password): ?object
     {
         $inserted = DB::table('users')
@@ -42,15 +43,15 @@ class UserRepository //Repository is only for DB queries
                 'username' => $username,
                 'password' => md5($password)
             ]);
-            
-            return (object) [
-                'id' => $inserted,
-                'name' => $name,
-                'username' => $username
-            ];
+
+        return (object) [
+            'id' => $inserted,
+            'name' => $name,
+            'username' => $username
+        ];
     }
 
-    public function authenticateToken (string $api_token) 
+    public function authenticateToken(string $api_token)
     {
         return DB::table('users')
             ->where('api_token', $api_token)
@@ -71,13 +72,16 @@ class UserRepository //Repository is only for DB queries
             ->delete() > 0;
     }
 
-    public function saveUserData(string $api_token): bool 
+    public function saveUserData(string $api_token): bool
     {
-        if ($user->api_token) {
+        $user = DB::table('users')->where('api_token', $api_token)->first();
+
+        if ($user && isset($user->data)) {
             return DB::table('users')
-                ->where('api_token)', $user->api_token)
-                ->update($user->data) > 0;
+                ->where('api_token', $api_token)
+                ->update(json_decode($user->data, true)) > 0;
         }
+        return false;
     }
 
     public function clearApiToken(int $id): bool
@@ -90,11 +94,9 @@ class UserRepository //Repository is only for DB queries
     public function assignApiTokenToUser(int $id): string
     {
         $api_token = Str::random(64);
-        
         DB::table('users')
             ->where('id', $id)
             ->update(['api_token' => $api_token]);
-            
         return $api_token;
     }
 }
