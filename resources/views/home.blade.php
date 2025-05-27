@@ -37,32 +37,32 @@
     </div>
 
     <script>
-        document.getElementById('register-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
+    document.getElementById('register-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
 
-            fetch('/api/apiRegister', {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                            'content')
-                    },
-                    body: formData
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.user) {
-                        swal("Success!", data.message, "success")
-                            .then(() => window.location.href = '/login');
-                    } else {
-                        swal("Error!", data.message || "Registration failed", "error");
-                    }
-                })
-                .catch(() => {
-                    swal("Error!", "Something went wrong", "error");
-                });
-        });
+        fetch('/api/apiRegister', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                        'content')
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.user) {
+                    swal("Success!", data.message, "success")
+                        .then(() => window.location.href = '/login');
+                } else {
+                    swal("Error!", data.message || "Registration failed", "error");
+                }
+            })
+            .catch(() => {
+                swal("Error!", "Something went wrong", "error");
+            });
+    });
     </script>
 
 </body>
