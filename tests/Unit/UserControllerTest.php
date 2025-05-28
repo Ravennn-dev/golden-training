@@ -243,7 +243,29 @@ class UserControllerTest extends TestCase
         $this->assertEquals($expected, $response);
     }
 
-    public function test_apiGetAuthenticatedUser_invalidToken_responseUnauthorized()
+    public function test_apiGetAuthenticatedUser_mockRepository_authenticateToken()
+    {
+        $token = 'api_token';
+
+        $request = Request::create(
+            '/api/apiUser',
+            'GET',
+            [],
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer ' . $token]
+        );
+
+        $mockRepository = $this->createMock(UserRepository::class);
+        $mockRepository->expects($this->once())
+            ->method('authenticateToken')
+            ->with($token);
+
+        $controller = $this->makeController($mockRepository);
+        $controller->apiGetAuthenticatedUser($request);
+    }
+
+    public function test_apiGetAuthenticatedUser_mockRepository_authenticateTokenInvalidToken_responseUnauthorized()
     {
         $token = 'invalid-token';
 
@@ -263,16 +285,15 @@ class UserControllerTest extends TestCase
         $stubRepository = $this->createMock(UserRepository::class);
         $stubRepository->method('authenticateToken')
             ->with($token)
-            ->willReturn(null); // Token is invalid
+            ->willReturn(null);
 
         $controller = $this->makeController($stubRepository);
-
         $response = $controller->apiGetAuthenticatedUser($request);
 
         $this->assertEquals($expected, $response);
     }
 
-    public function test_apiGetAuthenticatedUser_validToken_returnsUserData()
+    public function test_apiGetAuthenticatedUser_mockRepository_authenticateTokenValidToken_returnsUserData()
     {
         $token = 'valid-token';
 
@@ -331,7 +352,6 @@ class UserControllerTest extends TestCase
         $controller = $this->makeController($mockRepository);
         $controller->apiLogout($request);
     }
-
 
     public function test_apiLogout_mockRepository_authenticateToken_userExists_callsClearApiToken()
     {
@@ -919,7 +939,7 @@ class UserControllerTest extends TestCase
         $request = Request::create(
             '/api/update',
             'POST',
-            [], // No update data
+            [],
             [],
             [],
             [
