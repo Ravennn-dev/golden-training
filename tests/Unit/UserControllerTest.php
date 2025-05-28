@@ -265,7 +265,7 @@ class UserControllerTest extends TestCase
         $controller->apiGetAuthenticatedUser($request);
     }
 
-    public function test_apiGetAuthenticatedUser_mockRepository_authenticateTokenInvalidToken_responseUnauthorized()
+    public function test_apiGetAuthenticatedUser_stubRepositoryauthenticateToken_returnsUnauthorizedResponse()
     {
         $token = 'invalid-token';
 
@@ -293,7 +293,7 @@ class UserControllerTest extends TestCase
         $this->assertEquals($expected, $response);
     }
 
-    public function test_apiGetAuthenticatedUser_mockRepository_authenticateTokenValidToken_returnsUserData()
+    public function test_apiGetAuthenticatedUser_stubRepositoryauthenticateToken_returnsUserDataResponse()
     {
         $token = 'valid-token';
 
@@ -329,7 +329,7 @@ class UserControllerTest extends TestCase
         $this->assertEquals($expected, $response);
     }
 
-    public function test_apiLogout_mockRepository_authenticateToken_invalidToken_bearerTokenPassedToauthenticateToken()
+    public function test_apiLogout_mockRepositoryauthenticateToken_bearerTokenPassedToauthenticateToken()
     {
         $token = 'invalid-token';
 
@@ -353,7 +353,7 @@ class UserControllerTest extends TestCase
         $controller->apiLogout($request);
     }
 
-    public function test_apiLogout_mockRepository_authenticateToken_userExists_callsClearApiToken()
+    public function test_apiLogout_mockRepositoryauthenticateTokenUserExists_CallsClearApiToken()
     {
         $token = 'valid-token';
 
@@ -383,7 +383,7 @@ class UserControllerTest extends TestCase
         $controller->apiLogout($request);
     }
 
-    public function test_apiLogout_mockRepository_authenticateTokenUserNull_doesNotCallClearApiToken()
+    public function test_apiLogout_mockRepositoryauthenticateTokenUserNull_doesNotCallClearApiToken()
     {
         $token = 'invalid-token';
 
@@ -438,7 +438,7 @@ class UserControllerTest extends TestCase
         $controller->apiDeleteUser($request);
     }
 
-    public function test_apiDeleteUser_mockRepository_getUserByUsernameNullData()
+    public function test_apiDeleteUser_mockRepositorygetUserByUsernameNullData_returnsNotFoundResponse()
     {
         $expected = response()->json([
             'success' => false,
@@ -459,7 +459,7 @@ class UserControllerTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_apiDeleteUser_mockRepository_deleteUserCalledWhenUserExists()
+    public function test_apiDeleteUser_mockRepositorydeleteUser_calledWhenUserExists()
     {
         $request = new Request([
             'username' => 'test-username',
@@ -513,7 +513,7 @@ class UserControllerTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_apiUpdate_mockRepository_authenticateToken_invalidToken()
+    public function test_apiUpdate_callsAuthenticateTokenWithBearerToken()
     {
         $token = 'invalid-token';
 
@@ -537,7 +537,7 @@ class UserControllerTest extends TestCase
         $controller->apiUpdate($request);
     }
 
-    public function test_apiUpdate_mockRepository_authenticateTokenInvalidToken_responseUnauthorized()
+    public function test_apiUpdate_mockRepository_authenticateTokenInvalidToken_returnsUnauthorizedResponse()
     {
         $token = 'invalid-token';
 
@@ -567,7 +567,7 @@ class UserControllerTest extends TestCase
         $this->assertEquals($expected, $response);
     }
 
-    public function test_apiUpdate_RequestData_ValidationException()
+    public function test_apiUpdate_invalidRequestData_ValidationException()
     {
         $token = 'valid-token';
 
@@ -597,7 +597,7 @@ class UserControllerTest extends TestCase
         $controller->apiUpdate($request);
     }
 
-    public function test_apiUpdate_checkUsernameAvailable()
+    public function test_apiUpdate_whenUsernameAvailable_returnsOkResponse()
     {
         $token = 'valid-token';
         $user = (object)[
@@ -634,7 +634,7 @@ class UserControllerTest extends TestCase
         $this->assertEquals(200, $response->status());
     }
 
-    public function test_apiUpdate_checkUsernameAlreadyTaken_responseUsernameAlreadyTaken()
+    public function test_apiUpdate_checkUsernameAlreadyTaken_returnsUsernameAlreadyTakenResponse()
     {
         $token = 'valid-token';
         $currentUser = (object)[
@@ -681,7 +681,7 @@ class UserControllerTest extends TestCase
         $this->assertEquals($expected, $response);
     }
 
-    public function test_apiUpdate_updatesNameOnly()
+    public function test_apiUpdate_updatesNameOnly_andReturnsSuccessResponse()
     {
         $token = 'valid-token';
         $user = (object)[
@@ -727,7 +727,7 @@ class UserControllerTest extends TestCase
         $this->assertEquals($expected, $response);
     }
 
-    public function test_apiUpdate_updatesUsernameOnly()
+    public function test_apiUpdate_updatesUsernameOnly_andReturnsSuccessResponse()
     {
         $token = 'valid-token';
         $user = (object)[
@@ -773,7 +773,7 @@ class UserControllerTest extends TestCase
         $this->assertEquals($expected, $response);
     }
 
-    public function test_apiUpdate_updatesPasswordOnly()
+    public function test_apiUpdate_updatesPasswordOnly_andReturnsSuccessResponse()
     {
         $token = 'valid-token';
         $user = (object)[
@@ -818,7 +818,7 @@ class UserControllerTest extends TestCase
         $this->assertEquals($expected, $response);
     }
 
-    public function test_apiUpdate_updatesMultipleFields()
+    public function test_apiUpdate_updatesMultipleFields_andReturnsSuccessResponse()
     {
         $token = 'valid-token';
         $user = (object)[
@@ -872,7 +872,7 @@ class UserControllerTest extends TestCase
         $this->assertEquals($expected, $response->getData(true));
     }
 
-    public function test_apiUpdate_ignoresEmptyPassword()
+    public function test_apiUpdate_ignoresEmptyPassword_andReturnsSuccessResponse()
     {
         $token = 'valid-token';
         $user = (object)[
@@ -917,7 +917,7 @@ class UserControllerTest extends TestCase
         $this->assertEquals($expected, $response);
     }
 
-    public function test_apiUpdate_doesNothingWhenNoFieldsToUpdate()
+    public function test_apiUpdate_doesNothingWhenNoFieldsToUpdate_andReturnsSuccessResponse()
     {
         $token =
             'valid-token';
