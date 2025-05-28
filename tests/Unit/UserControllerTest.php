@@ -265,7 +265,7 @@ class UserControllerTest extends TestCase
         $controller->apiGetAuthenticatedUser($request);
     }
 
-    public function test_apiGetAuthenticatedUser_stubRepositoryauthenticateToken_returnsUnauthorizedResponse()
+    public function test_apiGetAuthenticatedUser_stubRepositoryauthenticateTokenNullData_returnsUnauthorizedResponse()
     {
         $token = 'invalid-token';
 
@@ -293,7 +293,7 @@ class UserControllerTest extends TestCase
         $this->assertEquals($expected, $response);
     }
 
-    public function test_apiGetAuthenticatedUser_stubRepositoryauthenticateToken_returnsUserDataResponse()
+    public function test_apiGetAuthenticatedUser_stubRepositoryauthenticateTokenHasData_returnsUserDataResponse()
     {
         $token = 'valid-token';
 
