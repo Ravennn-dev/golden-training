@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
-use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    public function __construct(private UserRepository $repository){}
+    public function __construct(private UserRepository $repository) {}
 
     public function apiRegister(Request $request)
     {
@@ -58,27 +56,28 @@ class UserController extends Controller
         $api_token = $this->repository->assignApiTokenToUser($user->id);
 
         return response()->json([
-                'success' => true,
-                'message' => 'Login successful',
-                'api_token' => $api_token,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'username' => $user->username
-                ]
-            ]);
+            'success' => true,
+            'message' => 'Login successful',
+            'api_token' => $api_token,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username
+            ]
+        ]);
     }
 
-    public function apiGetAuthenticatedUser(Request $request) 
+    public function apiGetAuthenticatedUser(Request $request)
     {
         $api_token = $request->bearerToken();
         $user = $this->repository->authenticateToken($api_token);
 
-        if(!$user) {
+        // if(is_null($user) === false) {
+        if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        return response()->json ([
+        return response()->json([
             'id' => $user->id,
             'name' => $user->name,
             'username' => $user->username,
@@ -138,11 +137,11 @@ class UserController extends Controller
 
     public function apiDeleteUser(Request $request)
     {
-         $request->validate([
+        $request->validate([
             'username' => 'required',
         ]);
 
-        $username = $request->input('username');
+        $username = $request->username;
 
         $user = $this->repository->getUserByUsername($username);
 
@@ -172,5 +171,4 @@ class UserController extends Controller
 
         return response()->json(['message' => 'You have been logged out.']);
     }
-
 }
