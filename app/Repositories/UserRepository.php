@@ -29,7 +29,7 @@ class UserRepository //Repository is only for DB queries
             ->where('name', $name);
     }
 
-    public function getUserById(int $id): ?User
+    public function getUserById(int $id): ?object
     {
         return DB::table('users')
             ->find($id);
