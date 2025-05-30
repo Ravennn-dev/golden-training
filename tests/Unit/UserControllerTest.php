@@ -50,7 +50,7 @@ class UserControllerTest extends TestCase
         $controller->apiRegister($request);
     }
 
-    public function test_apiRegister_stubRepositoryHasData_returnsUsernameAlreadyTaken()
+    public function test_apiRegister_stubRepositoryAlreadyExist_returnsUsernameAlreadyTaken()
     {
         $expected = new JsonResponse([
             'message' => 'Username already taken'
@@ -155,7 +155,7 @@ class UserControllerTest extends TestCase
         $controller->apiLogin($request);
     }
 
-    public function test_apiLogin_stubRepositoryNullData_returnsInvalidCredentials()
+    public function test_apiLogin_stubRepositoryNullUserData_returnsInvalidCredentials()
     {
         $expected = new JsonResponse([
             'success' => false,
@@ -203,7 +203,7 @@ class UserControllerTest extends TestCase
         $controller->apiLogin($request);
     }
 
-    public function test_apiLogin_stubRepositoryHasData_returnsLoginSuccess()
+    public function test_apiLogin_stubRepositoryHasUserData_returnsLoginSuccess()
     {
         $expected = new JsonResponse([
             'success' => true,
@@ -254,7 +254,7 @@ class UserControllerTest extends TestCase
         $controller->apiGetAuthenticatedUser($request);
     }
 
-    public function test_apiGetAuthenticatedUser_stubRepositoryNullData_returnsUnauthorizedResponse()
+    public function test_apiGetAuthenticatedUser_stubRepositoryNullTokenData_returnsUnauthorizedResponse()
     {
         $token = 'invalid-token';
 
@@ -276,7 +276,7 @@ class UserControllerTest extends TestCase
         $this->assertEquals($expected, $response);
     }
 
-    public function test_apiGetAuthenticatedUser_stubRepositoryHasData_returnsUserData()
+    public function test_apiGetAuthenticatedUser_stubRepositoryHasTokenData_returnsUserData()
     {
         $token = 'valid-token';
         $expected = new JsonResponse([
@@ -352,6 +352,7 @@ class UserControllerTest extends TestCase
 
         $stubRepository = $this->createMock(UserRepository::class);
         $stubRepository->method('authenticateToken')->willReturn(null);
+
         $stubRepository->expects($this->never())->method('clearApiToken');
 
         $controller = $this->makeController($stubRepository);
@@ -414,7 +415,7 @@ class UserControllerTest extends TestCase
         $controller->apiDeleteUser($request);
     }
 
-    public function test_apiDeleteUser_stubRepositoryNullData_returnsUserNotFound()
+    public function test_apiDeleteUser_stubRepositoryNullUserData_returnsUserNotFound()
     {
         $request = new Request([
             'username' => 'test-username',
@@ -553,7 +554,7 @@ class UserControllerTest extends TestCase
         $controller = $this->makeController($mockRepository);
         $controller->apiUpdate($request);
     }
-    public function test_apiUpdate_stubRepositoryHasData_returnsUsernameAlreadyTaken()
+    public function test_apiUpdate_stubRepositoryUsernameAlreadyExist_returnsUsernameAlreadyTaken()
     {
         $currentUser = (object)[
             'id' => 1,
