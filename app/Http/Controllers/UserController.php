@@ -38,7 +38,8 @@ class UserController extends Controller
 
     public function apiLogin(Request $request)
     {
-        $credentials = $request->validate([
+        // credentials
+        $request->validate([
             'username' => 'required',
             'password' => 'required'
         ]);
@@ -109,11 +110,11 @@ class UserController extends Controller
 
         $updateData = [];
 
-        if ($request->has('name')) {
+        if ($request->filled('name')) {
             $updateData['name'] = $validatedData['name'];
         }
 
-        if ($request->has('username')) {
+        if ($request->filled('username')) {
             $updateData['username'] = $validatedData['username'];
         }
 
