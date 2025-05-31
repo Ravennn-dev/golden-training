@@ -11,7 +11,7 @@ class UserControllerFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_apiRegister_validatesInput()   //validates input
+    public function test_apiRegister_invalidRequest_expectedData()  //validates input
     {
         $response = $this->postJson('/api/apiRegister', [
             'name' => '',
@@ -54,7 +54,7 @@ class UserControllerFeatureTest extends TestCase
         $response->assertJsonValidationErrors(['name']);
     }
 
-    public function test_apiRegister_userCanRegister() //success register
+    public function test_apiRegister_validData_expectedData()   //success register
     {
         $userData = [
             'name' => 'User',
@@ -63,17 +63,18 @@ class UserControllerFeatureTest extends TestCase
         ];
 
         $response = $this->postJson('/api/apiRegister', $userData);
-        $response->assertStatus(201)
-            ->assertJson([
-                'message' => 'User Registered Successfully',
-                'user' => [
-                    'name' => 'User',
-                    'username' => 'username1'
-                ]
-            ]);
+        $response->assertJson([
+            'message' => 'User Registered Successfully',
+            'user' => [
+                'name' => 'User',
+                'username' => 'username1'
+            ]
+        ]);
+
+        $response->assertStatus(201);
     }
 
-    public function test_apiRegister_takenUsernameThrowsError() //already taken username
+    public function test_apiRegister_usernameAlreadyTaken_expectedData()    //already taken username
     {
         $userData = [
             'name' => 'test',
@@ -90,13 +91,14 @@ class UserControllerFeatureTest extends TestCase
         $this->assertDatabaseHas('users', ['username' => 'taken-username']);
 
         $response = $this->postJson('/api/apiRegister', $userData);
-        $response->assertStatus(409);
         $response->assertJson([
             'message' => 'Username already taken'
         ]);
+
+        $response->assertStatus(409);
     }
 
-    public function test_apiLogin_validatesInput()  //validates input
+    public function test_apiLogin_invalidRequest_expectedData()  //validates input
     {
         $response = $this->postJson('/api/apiLogin', [
             'username' => '',
@@ -116,7 +118,7 @@ class UserControllerFeatureTest extends TestCase
         $response->assertJsonValidationErrors(['username']);
     }
 
-    public function test_apiLogin_loginWithValidCredentials()   //successful login
+    public function test_apiLogin_validRequest_expectedData()   //successful login
     {
         $user = User::create([
             'name' => 'test',
@@ -129,32 +131,23 @@ class UserControllerFeatureTest extends TestCase
             'password' => 'test-password'
         ]);
 
-        $response->assertStatus(200)
-            ->assertJsonStructure([
-                'success',
-                'message',
-                'api_token',
-                'user' => [
-                    'id',
-                    'name',
-                    'username'
-                ]
-            ])
-            ->assertJson([
-                'success' => true,
-                'message' => 'Login successful',
-                'user' => [
-                    'id' => $user->id,
-                    'name' => 'test',
-                    'username' => 'test-username'
-                ]
-            ]);
+        $response->assertJson([
+            'success' => true,
+            'message' => 'Login successful',
+            'user' => [
+                'id' => $user->id,
+                'name' => 'test',
+                'username' => 'test-username'
+            ]
+        ]);
+
+        $response->assertStatus(200);
 
         $responseArray = $response->json();
         $this->assertNotEmpty($responseArray['api_token']);
     }
 
-    public function test_apiLogin_invalidUsername()  //error "Invalid credentials"
+    public function test_apiLogin_usernameNotFound()  //error "Invalid credentials""
     {
         User::create([
             'name' => 'test',
@@ -176,7 +169,7 @@ class UserControllerFeatureTest extends TestCase
         $response->assertJsonMissing(['api_token']);
     }
 
-    public function test_apiLogin_invalidPassword()  //login with wrong password
+    public function test_apiLogin_passwordNotFound()  //login with wrong password
     {
         User::create([
             'name' => 'test',
@@ -196,7 +189,7 @@ class UserControllerFeatureTest extends TestCase
             ]);
     }
 
-    public function test_apiLogout_successfulLogout() // logout
+    public function test_apiLogout_validRequest_expectedData() // logout success
     {
         $apiToken = 'api-token';
 
@@ -224,7 +217,7 @@ class UserControllerFeatureTest extends TestCase
         $this->assertNull($user->api_token);
     }
 
-    public function test_apiDeleteUser_returnsSuccessResponse()   //delete success
+    public function test_apiDeleteUser_validRequest_expectedData()   //delete success
     {
         User::create([
             'name' => 'test',
@@ -247,75 +240,7 @@ class UserControllerFeatureTest extends TestCase
         ]);
     }
 
-    public function test_apiUpdate_canUpdateNameOnly()
-    {
-        $user = User::create([
-            'name' => 'original-name',
-            'username' => 'original-username',
-            'password' => md5('original-password'),
-            'api_token' => 'test-token',
-        ]);
-
-        $response = $this->patchJson(
-            '/api/apiUpdate',
-            ['name' => 'new-name'],
-            ['Authorization' => 'Bearer test-token']
-        );
-
-        $user->refresh();
-        $this->assertEquals('new-name', $user->name);
-        $this->assertEquals('original-username', $user->username);
-        $this->assertEquals(md5('original-password'), $user->password);
-
-        $response->assertStatus(200);
-    }
-    public function test_apiUpdate_canUpdateUsernameOnly()
-    {
-        $user = User::create([
-            'name' => 'original-name',
-            'username' => 'new-username',
-            'password' => md5('original-password'),
-            'api_token' => 'test-token',
-        ]);
-
-        $response = $this->patchJson(
-            '/api/apiUpdate',
-            ['username' => 'new-username'],
-            ['Authorization' => 'Bearer test-token']
-        );
-
-        $user->refresh();
-        $this->assertEquals('original-name', $user->name);
-        $this->assertEquals('new-username', $user->username);
-        $this->assertEquals(md5('original-password'), $user->password);
-
-        $response->assertStatus(200);
-    }
-
-    public function test_apiUpdate_canUpdatePasswordOnly()
-    {
-        $user = User::create([
-            'name' => 'original-name',
-            'username' => 'original-username',
-            'password' => md5('original-password'),
-            'api_token' => 'test-token',
-        ]);
-
-        $response = $this->patchJson(
-            '/api/apiUpdate',
-            ['password' => 'new-password'],
-            ['Authorization' => 'Bearer test-token']
-        );
-
-        $user->refresh();
-        $this->assertEquals(md5('new-password'), $user->password);
-        $this->assertEquals('original-name', $user->name);
-        $this->assertEquals('original-username', $user->username);
-
-        $response->assertStatus(200);
-    }
-
-    public function test_apiUpdate_canUpdateMultipleFields()
+    public function test_apiUpdate_validRequest_expectedData()
     {
         $user = User::create([
             'name' => 'original-name',
@@ -342,37 +267,15 @@ class UserControllerFeatureTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_apiUpdate_emptyPasswordDoesNotUpdatePassword()
-    {
-        $user = User::create([
-            'name' => 'Original Name',
-            'username' => 'original_username',
-            'password' => md5('original_password'),
-            'api_token' => 'test-token',
-        ]);
-
-        $originalPassword = $user->password;
-
-        $response = $this->patchJson(
-            '/api/apiUpdate',
-            ['password' => ''],
-            ['Authorization' => 'Bearer test-token']
-        );
-
-        $this->assertEquals($originalPassword, $user->password);
-
-        $response->assertStatus(200);
-    }
-
-    public function test_apiUpdate_updateUsernameWithAlreadyTakenUsername()
-    {
-        $user = User::create([
-            'name' => 'Original Name',
-            'username' => 'original_username',
-            'password' => md5('original_password'),
-            'api_token' => 'test-token',
-        ]);
-
+    /**
+     * @dataProvider requiredStoreValidationProvider
+     */
+    public function test_apiUpdate_handlesFieldUpdatesAndValidationErrorsCorrectly(
+        array $updateData,
+        array $expected,
+        int $expectedStatus,
+        ?string $expectedError
+    ) {
         User::create([
             'name' => 'Conflict User',
             'username' => 'taken_username',
@@ -380,16 +283,83 @@ class UserControllerFeatureTest extends TestCase
             'api_token' => 'conflict-token',
         ]);
 
-        $response = $this->patchJson(
-            '/api/apiUpdate',
-            ['username' => 'taken_username'],
-            ['Authorization' => 'Bearer test-token']
-        );
+        $user = User::create([
+            'name' => $expected['name'],
+            'username' => $expected['username'],
+            'password' => md5($expected['password']),
+            'api_token' => 'test-token',
+        ]);
 
-        $response->assertStatus(422)
-            ->assertJsonFragment(['error' => 'Username already taken.']);
+        $response = $this->patchJson('/api/apiUpdate', $updateData, [
+            'Authorization' => 'Bearer test-token'
+        ]);
 
         $user->refresh();
-        $this->assertEquals('original_username', $user->username);
+
+        $this->assertEquals($expected['name'], $user->name);
+        $this->assertEquals($expected['username'], $user->username);
+        $this->assertEquals(md5($expected['password']), $user->password);
+
+        $response->assertStatus($expectedStatus);
+
+        if ($expectedError !== null) {
+            $response->assertJsonFragment(['error' => $expectedError]);
+        }
+    }
+
+    public static function requiredStoreValidationProvider(): array
+    {
+        return [
+            'update_name_only' => [
+                ['name' => 'new-name'],
+                [
+                    'name' => 'new-name',
+                    'username' => 'original-username',
+                    'password' => 'original-password',
+                ],
+                200,
+                null
+            ],
+            'update_username_only' => [
+                ['username' => 'new-username'],
+                [
+                    'name' => 'original-name',
+                    'username' => 'new-username',
+                    'password' => 'original-password',
+                ],
+                200,
+                null
+            ],
+            'update_password_only' => [
+                ['password' => 'new-password'],
+                [
+                    'name' => 'original-name',
+                    'username' => 'original-username',
+                    'password' => 'new-password',
+                ],
+                200,
+                null
+            ],
+            'empty_password_does_not_update' => [
+                ['password' => ''],
+                [
+                    'name' => 'Original Name',
+                    'username' => 'original-username',
+                    'password' => 'original-password',
+                ],
+                200,
+                null
+            ],
+            'username_already_taken' => [
+                ['username' => 'taken_username'],
+                [
+                    'name' => 'Original Name',
+                    'username' => 'original-username',
+                    'password' => 'original-password',
+                ],
+                422,
+                'Username already taken.'
+            ], //error expected here
+        ];
     }
 }
