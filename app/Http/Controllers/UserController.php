@@ -126,14 +126,14 @@ class UserController extends Controller
             $this->repository->updateUser($user->id, $updateData);
         }
 
-        $this->repository->getUserById($user->id);
+        $updatedUser = $this->repository->getUserById($user->id);
 
         return response()->json([
             'success' => true,
             'message' => 'User updated successfully',
             'user' => [
-                'name' => $user->name,
-                'username' => $user->username,
+                'name' => $updatedUser->name,
+                'username' => $updatedUser->username,
             ]
         ]);
     }
