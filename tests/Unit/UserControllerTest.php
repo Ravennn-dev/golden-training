@@ -2,7 +2,6 @@
 
 namespace Tests\Unit;
 
-use Js;
 use Tests\TestCase;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -515,7 +514,6 @@ class UserControllerTest extends TestCase
 
     public function test_apiUpdate_mockRepository_getUserByUsername()
     {
-        $token = 'token';
         $username = 'new-username';
 
         $request = new Request(
@@ -524,7 +522,7 @@ class UserControllerTest extends TestCase
                 'username' => $username
             ],
         );
-        $request->headers->set('Authorization', 'Bearer ' . $token);
+        $request->headers->set('Authorization', 'Bearer valid-token');
 
         $mockRepository = $this->createMock(UserRepository::class);
 
@@ -892,6 +890,9 @@ class UserControllerTest extends TestCase
                 'name' => 'test',
                 'username' => 'test-username'
             ]);
+
+        $stubRepository->method('getUserByUsername')
+            ->willReturn(null);
 
         $stubRepository->method('updateUser');
 
