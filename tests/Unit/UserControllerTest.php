@@ -153,7 +153,6 @@ class UserControllerTest extends TestCase
             'username' => 'testUsername',
             'password' => 'testPassword'
         ];
-
         unset($requestData[$parameter]);
 
         $request = new Request($requestData);
@@ -217,16 +216,15 @@ class UserControllerTest extends TestCase
     {
         $request = new Request([
             'username' => 'testUsername',
-            'password' => 'testPassword',
+            'password' => 'testPassword'
         ]);
 
         $mockRepository = $this->createMock(UserRepository::class);
-
         $mockRepository->method('getUserByUsernamePassword')
             ->willReturn((object)[
                 'id' => 1,
                 'name' => 'testName',
-                'username' => 'testUsername',
+                'username' => 'testUsername'
             ]);
 
         $mockRepository->expects($this->once())
@@ -344,6 +342,7 @@ class UserControllerTest extends TestCase
 
         $mockRepository->expects($this->once())
             ->method('authenticateToken')
+            ->with('testToken')
             ->willReturn((object)['id' => 1]);
 
         $controller = $this->makeController($mockRepository);
