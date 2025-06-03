@@ -112,7 +112,7 @@ class UserControllerTest extends TestCase
         $controller->apiRegister($request);
     }
 
-    public function test_apiRegister_stubRepositoryNullTokenData_returnsRegisterSuccess()
+    public function test_apiRegister_stubRepositoryUsernameNotExisting_returnsRegisterSuccess()
     {
         $expected = new JsonResponse([
             'message' => 'User Registered Successfully',
