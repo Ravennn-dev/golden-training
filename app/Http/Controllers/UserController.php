@@ -54,12 +54,12 @@ class UserController extends Controller
             ], 401);
         }
 
-        $api_token = $this->repository->assignApiTokenToUser($user->id);
+        $apiToken = $this->repository->assignApiTokenToUser($user->id);
 
         return response()->json([
             'success' => true,
             'message' => 'Login successful',
-            'api_token' => $api_token,
+            'api_token' => $apiToken,
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -70,8 +70,8 @@ class UserController extends Controller
 
     public function apiGetAuthenticatedUser(Request $request)
     {
-        $api_token = $request->bearerToken();
-        $user = $this->repository->authenticateToken($api_token);
+        $apiToken = $request->bearerToken();
+        $user = $this->repository->authenticateToken($apiToken);
 
         // if(is_null($user) === false) {
         if (!$user) {
@@ -87,8 +87,8 @@ class UserController extends Controller
 
     public function apiUpdate(Request $request)
     {
-        $api_token = $request->bearerToken();
-        $user = $this->repository->authenticateToken($api_token);
+        $apiToken = $request->bearerToken();
+        $user = $this->repository->authenticateToken($apiToken);
 
         if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);
@@ -144,9 +144,7 @@ class UserController extends Controller
             'username' => 'required',
         ]);
 
-        $username = $request->username;
-
-        $user = $this->repository->getUserByUsername($username);
+        $user = $this->repository->getUserByUsername($request->username);
 
         if (!$user) {
             return response()->json([
@@ -165,8 +163,8 @@ class UserController extends Controller
 
     public function apiLogout(Request $request)
     {
-        $api_token = $request->bearerToken();
-        $user = $this->repository->authenticateToken($api_token);
+        $apiToken = $request->bearerToken();
+        $user = $this->repository->authenticateToken($apiToken);
 
         if ($user) {
             $this->repository->clearApiToken($user->id);
