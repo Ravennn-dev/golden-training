@@ -355,7 +355,6 @@ class UserControllerTest extends TestCase
         $request->headers->set('Authorization', 'Bearer testToken');
 
         $mockRepository = $this->createMock(UserRepository::class);
-
         $mockRepository->method('authenticateToken')
             ->willReturn((object)['id' => 1]);
 
@@ -370,7 +369,7 @@ class UserControllerTest extends TestCase
     public function test_apiLogout_stubRepositoryTokenHasData_returnsLogOutSuccess()
     {
         $expected = new JsonResponse([
-            'message' => 'You have been logged out.',
+            'message' => 'You have been logged out.'
         ]);
 
         $request = new Request([]);
@@ -399,7 +398,7 @@ class UserControllerTest extends TestCase
     public function test_apiDeleteUser_mockRepository_getUserByUsername()
     {
         $request = new Request([
-            'username' => 'testUsername',
+            'username' => 'testUsername'
         ]);
 
         $mockRepository = $this->createMock(UserRepository::class);
@@ -425,7 +424,7 @@ class UserControllerTest extends TestCase
         $stubRepository->method('getUserByUsername')
             ->willReturn(null);
 
-        $controller = new UserController($stubRepository);
+        $controller = $this->makeController($stubRepository);
         $response = $controller->apiDeleteUser($request);
 
         $this->assertEquals($expected, $response);
@@ -436,7 +435,6 @@ class UserControllerTest extends TestCase
         $request = new Request(['username' => 'testUsername']);
 
         $mockRepository = $this->createMock(UserRepository::class);
-
         $mockRepository->method('getUserByUsername')
             ->willReturn((object)['id' => 1]);
 
@@ -503,16 +501,13 @@ class UserControllerTest extends TestCase
 
     public function test_apiUpdate_mockRepository_getUserByUsername()
     {
-        $request = new Request(
-            [
-                'name' => 'testName',
-                'username' => 'newUsername'
-            ],
-        );
+        $request = new Request([
+            'name' => 'testName',
+            'username' => 'newUsername'
+        ]);
         $request->headers->set('Authorization', 'Bearer testToken');
 
         $mockRepository = $this->createMock(UserRepository::class);
-
         $mockRepository->method('authenticateToken')
             ->willReturn((object)['id' => 1]);
 
@@ -556,16 +551,10 @@ class UserControllerTest extends TestCase
     }
 
     #[DataProvider('updateDataParams')]
-    public function test_apiUpdate_mockRepository_updateUser($parameter, $data)
+    public function test_apiUpdate_mockRepository_updateUser($parameter)
     {
-        $request = new Request([
-            'name' => '',
-            'username' => '',
-            'password' => '',
-        ]);
+        $request = new Request($parameter);
         $request->headers->set('Authorization', 'Bearer testToken');
-
-        $request[$parameter] = $data;
 
         $mockRepository = $this->createMock(UserRepository::class);
         $mockRepository->method('authenticateToken')
@@ -576,7 +565,7 @@ class UserControllerTest extends TestCase
 
         $mockRepository->expects($this->once())
             ->method('updateUser')
-            ->with(1, [$parameter => $data]);
+            ->with(1, $parameter);
 
         $mockRepository->method('getUserById')
             ->willReturn((object)[
@@ -592,9 +581,12 @@ class UserControllerTest extends TestCase
     public static function updateDataParams()
     {
         return [
-            ['name', 'testName'],
-            ['username', 'testUsername'],
-            // ['password', 'testPassword']
+            [['name' => 'testName']],
+            [['username' => 'testUsername']],
+            [[
+                'name' => 'testName',
+                'username' => 'testUsername'
+            ]]
         ];
     }
 
