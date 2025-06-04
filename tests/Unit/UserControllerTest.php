@@ -556,6 +556,10 @@ class UserControllerTest extends TestCase
         $request = new Request($parameter);
         $request->headers->set('Authorization', 'Bearer testToken');
 
+        if (isset($parameter['password'])){
+            $parameter['password'] = md5($parameter['password']);
+        }
+
         $mockRepository = $this->createMock(UserRepository::class);
         $mockRepository->method('authenticateToken')
             ->willReturn((object)['id' => 1]);
@@ -571,7 +575,7 @@ class UserControllerTest extends TestCase
             ->willReturn((object)[
                 'id' => 1,
                 'name' => 'testName',
-                'username' => 'newUsername'
+                'username' => 'testUsername'
             ]);
 
         $controller = $this->makeController($mockRepository);
@@ -583,9 +587,24 @@ class UserControllerTest extends TestCase
         return [
             [['name' => 'testName']],
             [['username' => 'testUsername']],
+            [['password' => 'testPassword']],
             [[
                 'name' => 'testName',
                 'username' => 'testUsername'
+
+            ]],
+            [[
+                'username' => 'testUsername',
+                'password' => 'testPassword',
+            ]],
+            [[
+                'name' => 'testName',
+                'password' => 'testPassword',
+            ]],
+            [[
+                'name' => 'testName',
+                'username' => 'testUsername',
+                'password' => 'testPassword',
             ]]
         ];
     }
