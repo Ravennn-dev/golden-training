@@ -39,7 +39,7 @@ class ApiRegisterTest extends TestCase
         ]);
     }
 
-    public function test_apiRegister_duplicateUsername_expectedResponse()
+    public function test_apiRegister_usernameAlreadyTaken_expectedResponse()
     {
         DB::table('users')->insert([
             'name' => 'test-name',
@@ -63,7 +63,7 @@ class ApiRegisterTest extends TestCase
     }
 
     #[DataProvider('registerDataParams')]
-    public function test_apiRegister_missingRequiredFields($parameter)
+    public function test_apiRegister_missingRequestData_expectedResponse($parameter)
     {
         $request = [
             'name' => 'test-name',
