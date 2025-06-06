@@ -4,6 +4,7 @@ use Tests\TestCase;
 
 class ActivityTest extends TestCase
 {
+    // Raven
     public function test_example()
     {
         $response = $this->get('/test-example');
