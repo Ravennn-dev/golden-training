@@ -4,7 +4,7 @@ use Tests\TestCase;
 
 class ActivityTest extends TestCase
 {
-    // Raven
+    // Raven this
     public function test_example()
     {
         $response = $this->get('/test-example');
